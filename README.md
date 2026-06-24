@@ -1,45 +1,33 @@
-# Linux Command-Line Basics — Assignment Submission
+# Linux Commands Assignment
 
-A walkthrough of 7 core Linux/Unix command-line tasks, each with the exact command used, the actual output, and an explanation.
+Name: Rishav Jamwal
 
-> Environment note: Run on macOS (zsh). All commands are standard POSIX/Linux commands. The one exception is `wget`, which is not bundled with macOS — the macOS equivalent `curl` is shown, plus how to install `wget`.
+I did all of this on my Mac using the Terminal (zsh shell). I made a folder called `linux_assignment` and worked inside it. Below is what I did for each part and what I got back. Most of these are normal Linux commands so they work the same on Linux too. The only one that was different is wget, which my Mac didn't have, so I used curl instead and explained that part.
 
----
+## 1. Creating and renaming files
 
-## 1. Creating and Renaming Files/Directories
+First I made a folder with mkdir, then made an empty file inside it with touch, and finally renamed the file using mv.
 
-**Commands**
 ```bash
-mkdir test_dir                 # create a directory
-touch test_dir/example.txt     # create an empty file inside it
-mv test_dir/example.txt test_dir/renamed_example.txt   # rename the file
+mkdir test_dir
+touch test_dir/example.txt
+mv test_dir/example.txt test_dir/renamed_example.txt
 ```
 
-**Output**
-```
---- before rename ---
--rw-r--r--  1 user  staff  0  example.txt
---- after rename ---
--rw-r--r--  1 user  staff  0  renamed_example.txt
-```
+After running mv the file showed up as renamed_example.txt when I listed the folder. So mv basically renames the file when you keep it in the same folder. touch is handy because it just makes a blank file without opening any editor.
 
-**Explanation**
-- `mkdir` ("make directory") creates a new folder.
-- `touch` creates an empty file (or updates the timestamp if it already exists).
-- `mv` ("move") moves a file; when source and destination are in the same directory, it effectively **renames** the file.
+## 2. Looking at file contents
 
----
+I used the /etc/passwd file for this since it's always there. cat prints the whole thing, head shows the top of the file and tail shows the bottom.
 
-## 2. Viewing File Contents
-
-**Commands**
 ```bash
-cat /etc/passwd        # print the entire file
-head -5 /etc/passwd    # first 5 lines
-tail -5 /etc/passwd    # last 5 lines
+cat /etc/passwd
+head -5 /etc/passwd
+tail -5 /etc/passwd
 ```
 
-**Output (head -5)**
+head -5 gave me the first 5 lines, which on a Mac are just comment lines at the top:
+
 ```
 ##
 # User Database
@@ -48,7 +36,8 @@ tail -5 /etc/passwd    # last 5 lines
 # in single-user mode.  At other times this information is provided by
 ```
 
-**Output (tail -5)**
+And tail -5 gave the last 5 lines, which are the system accounts:
+
 ```
 _spinandd:*:305:305:SPINAND Daemon:/var/empty:/usr/bin/false
 _corespeechd:*:306:306:CoreSpeech Services:/var/empty:/usr/bin/false
@@ -57,131 +46,71 @@ _mds_stores:*:308:308:Spotlight File Metadata Index Daemon:/var/empty:/usr/bin/f
 _oahd:*:441:441:OAH Daemon:/var/empty:/usr/bin/false
 ```
 
-**Explanation**
-- `cat` ("concatenate") dumps the whole file to the screen.
-- `head -5` shows only the **first** 5 lines — useful for previewing big files.
-- `tail -5` shows only the **last** 5 lines — useful for reading the newest log entries.
-- `/etc/passwd` lists user accounts; each line is `username:password:UID:GID:description:home:shell`.
+I used head and tail with -5 so I didn't have to scroll through the whole file. cat is fine for short files but for big ones head/tail are nicer.
 
----
+## 3. Searching with grep
 
-## 3. Searching for Patterns
+Then I searched for the word root inside /etc/passwd.
 
-**Command**
 ```bash
 grep "root" /etc/passwd
 ```
 
-**Output**
+It printed back every line that had root in it:
+
 ```
 root:*:0:0:System Administrator:/var/root:/bin/sh
 daemon:*:1:1:System Services:/var/root:/usr/bin/false
 _cvmsroot:*:212:212:CVMS Root:/var/empty:/usr/bin/false
 ```
 
-**Explanation**
-`grep` ("global regular expression print") scans a file line by line and prints every line containing the pattern. Here it returns all lines mentioning `root`. Add `-i` for case-insensitive, `-n` to show line numbers, `-r` to search a whole directory.
+grep goes line by line and only shows the lines that match what you searched for. There are a couple of system lines that point to /var/root as their home folder, so those came up too.
 
----
+## 4. Zipping and unzipping
 
-## 4. Zipping and Unzipping
+I zipped the whole test_dir folder and then unzipped it into a fresh folder to check it worked.
 
-**Commands**
 ```bash
-zip -r test_dir.zip test_dir          # compress the directory
-unzip -o test_dir.zip -d unzipped_dir # extract into a new directory
+zip -r test_dir.zip test_dir
+unzip -o test_dir.zip -d unzipped_dir
 ```
 
-**Output**
-```
-  adding: test_dir/ (stored 0%)
-  adding: test_dir/renamed_example.txt (stored 0%)
-Archive:  test_dir.zip
-   creating: unzipped_dir/test_dir
- extracting: unzipped_dir/test_dir/renamed_example.txt
-```
+The -r part is important because it tells zip to include everything inside the folder, not just the folder name. When I unzipped it, the renamed_example.txt file was sitting inside unzipped_dir/test_dir, exactly like the original. The -d just lets you pick which folder to extract into.
 
-**Explanation**
-- `zip -r` compresses a directory into a single `.zip` archive; `-r` means **recursive** (include all sub-files/folders).
-- `unzip -d` extracts an archive into a target directory (`-o` overwrites without prompting).
+## 5. Downloading a file
 
----
+The task asked to use wget, but when I tried it I got "command not found" because Macs don't come with wget installed. So I used curl instead, which does the same job. (If I wanted the real wget I could install it with brew install wget.)
 
-## 5. Downloading Files
-
-**Command (Linux)**
 ```bash
-wget https://example.com/sample.txt
+wget https://example.com/sample.txt        # this is the Linux way
+curl -L -o sample.html https://example.com   # what I actually used on Mac
 ```
 
-**macOS equivalent (wget not preinstalled)**
-```bash
-curl -L -o sample.html https://example.com
-```
+curl downloaded the file and saved it as sample.html. The -o lets you name the saved file and -L makes it follow redirects in case the link bounces somewhere else. I also noticed the sample.txt link in the example doesn't really exist (gives a 404), so I just downloaded the example.com homepage to show the download working.
 
-**Output**
-```
--rw-r--r--  1 user  staff  559  sample.html
-<!doctype html><html lang="en"><head><title>Example Domain</title>...
-```
+## 6. Changing permissions
 
-**Explanation**
-`wget` downloads files from a URL over HTTP/HTTPS/FTP. On macOS it isn't installed by default, so `curl -L -o <file> <url>` does the same job (`-L` follows redirects, `-o` sets the output filename).
-To install real `wget` on macOS: `brew install wget`.
+I made a file called secure.txt and then used chmod to make it read only for everyone.
 
----
-
-## 6. Changing Permissions
-
-**Commands**
 ```bash
 echo "some secret content" > secure.txt
-chmod 444 secure.txt          # read-only for owner, group, and others
+chmod 444 secure.txt
 ```
 
-**Output**
-```
---- before ---  -rw-r--r--   secure.txt
---- after  ---  -r--r--r--   secure.txt
-# Attempting to write:
-permission denied: secure.txt   <-- write blocked as expected
-```
+Before the change the permissions were -rw-r--r-- and after they became -r--r--r--. To test it I tried to add more text to the file and the terminal said "permission denied", which is exactly what should happen since I took away write access. The 444 is in octal where 4 means read, 2 means write and 1 means execute, and the three digits are for the owner, the group and everyone else. So 444 is read for all three and nothing else. I can undo it with chmod 644 later if I need to edit it again.
 
-**Explanation**
-`chmod` ("change mode") sets file permissions. The octal `444` means **read (4) only** for all three identity classes (owner / group / others) and no write or execute. After this, even the owner cannot modify the file until permissions are restored (e.g. `chmod 644`).
+## 7. Environment variables
 
-Permission digits: read = 4, write = 2, execute = 1 (added together per class).
+Last one. I set my own environment variable with export and then printed it out.
 
----
-
-## 7. Working with Environment Variables
-
-**Commands**
 ```bash
 export MY_VAR="Hello, Linux!"
 echo $MY_VAR
 env | grep MY_VAR
 ```
 
-**Output**
-```
-Hello, Linux!
-MY_VAR=Hello, Linux!
-```
+echo $MY_VAR printed Hello, Linux! and when I ran env (which lists all the variables) I could see MY_VAR=Hello, Linux! in there too. One thing to remember is that this only lasts for the current terminal window. If I close it the variable is gone, so to keep it permanently I'd add the export line to my ~/.zshrc file.
 
-**Explanation**
-`export` defines an **environment variable** and makes it available to the current shell and any child processes it launches. `echo $MY_VAR` prints its value; `env` lists all environment variables. Note: this lasts only for the current terminal session — to make it permanent, add the `export` line to `~/.zshrc` or `~/.bashrc`.
+## Wrap up
 
----
-
-## Summary Table
-
-| # | Task | Key Command(s) |
-|---|------|----------------|
-| 1 | Create & rename | `mkdir`, `touch`, `mv` |
-| 2 | View contents | `cat`, `head -5`, `tail -5` |
-| 3 | Search patterns | `grep "root" /etc/passwd` |
-| 4 | Zip / unzip | `zip -r`, `unzip -d` |
-| 5 | Download | `wget` / `curl -L -o` |
-| 6 | Permissions | `chmod 444` |
-| 7 | Env variables | `export MY_VAR=...` |
+All seven tasks worked. The only thing that needed changing was wget since it isn't on Mac by default, so I used curl which does the same thing. Everything else ran without any problems. The screenshots of the terminal are attached in the submission doc.
