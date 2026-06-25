@@ -93,7 +93,7 @@ def render(txt_path, png_path, title):
     canvas.save(png_path)
     return png_path
 
-WT = "linux_assignment — -zsh — 80×24"
+WT = "rishav — -zsh — 80×24"
 tasks = [
     ("task1", WT),
     ("task2", WT),

@@ -1,0 +1,13 @@
+rishav@Rishavs-MacBook-Air ~ % head -5 /etc/passwd
+##
+# User Database
+# 
+# Note that this file is consulted directly only when the system is running
+# in single-user mode.  At other times this information is provided by
+
+rishav@Rishavs-MacBook-Air ~ % tail -5 /etc/passwd
+_spinandd:*:305:305:SPINAND Daemon:/var/empty:/usr/bin/false
+_corespeechd:*:306:306:CoreSpeech Services:/var/empty:/usr/bin/false
+_diagnosticservicesd:*:307:307:Diagnostic Services:/var/empty:/usr/bin/false
+_mds_stores:*:308:308:Spotlight File Metadata Index Daemon:/var/empty:/usr/bin/false
+_oahd:*:441:441:OAH Daemon:/var/empty:/usr/bin/false

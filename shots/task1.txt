@@ -1,0 +1,7 @@
+rishav@Rishavs-MacBook-Air ~ % mkdir test_dir
+rishav@Rishavs-MacBook-Air ~ % touch test_dir/example.txt
+rishav@Rishavs-MacBook-Air ~ % ls test_dir
+example.txt
+rishav@Rishavs-MacBook-Air ~ % mv test_dir/example.txt test_dir/renamed_example.txt
+rishav@Rishavs-MacBook-Air ~ % ls test_dir
+renamed_example.txt

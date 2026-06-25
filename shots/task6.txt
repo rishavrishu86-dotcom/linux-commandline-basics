@@ -1,0 +1,8 @@
+rishav@Rishavs-MacBook-Air ~ % echo "some secret content" > secure.txt
+rishav@Rishavs-MacBook-Air ~ % ls -l secure.txt
+-rw-r--r--@ 1 rishavjamwal  staff  20 Jun 25 11:05 secure.txt
+rishav@Rishavs-MacBook-Air ~ % chmod 444 secure.txt
+rishav@Rishavs-MacBook-Air ~ % ls -l secure.txt
+-r--r--r--@ 1 rishavjamwal  staff  20 Jun 25 11:05 secure.txt
+rishav@Rishavs-MacBook-Air ~ % echo "try append" >> secure.txt
+zsh: permission denied: secure.txt

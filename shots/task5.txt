@@ -1,0 +1,8 @@
+rishav@Rishavs-MacBook-Air ~ % wget https://example.com/sample.txt
+zsh: command not found: wget
+rishav@Rishavs-MacBook-Air ~ % curl -L -o sample.html https://example.com
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   559  100   559    0     0   3278      0 --:--:-- --:--:-- --:--:--  3269
+rishav@Rishavs-MacBook-Air ~ % ls -l sample.html
+-rw-r--r--@ 1 rishavjamwal  staff  559 Jun 25 11:05 sample.html

@@ -1,0 +1,5 @@
+rishav@Rishavs-MacBook-Air ~ % export MY_VAR="Hello, Linux!"
+rishav@Rishavs-MacBook-Air ~ % echo $MY_VAR
+Hello, Linux!
+rishav@Rishavs-MacBook-Air ~ % env | grep MY_VAR
+MY_VAR=Hello, Linux!
