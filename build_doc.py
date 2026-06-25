@@ -8,78 +8,100 @@ HOME = os.path.expanduser("~")
 DIR = os.path.join(HOME, "linux_assignment")
 SHOTS = os.path.join(DIR, "shots")
 
+from PIL import ImageFilter
+
 MENLO = "/System/Library/Fonts/Menlo.ttc"
-FS = 26                      # font size (rendered big, scaled down in doc for crispness)
+SF = "/System/Library/Fonts/SFNS.ttf"        # title bar font
+S = 2                                         # retina 2x supersampling
+FS = 12 * S                                   # Terminal default Menlo 12pt
 font = ImageFont.truetype(MENLO, FS)
-bold = ImageFont.truetype(MENLO, FS, index=1)
+try:
+    titlefont = ImageFont.truetype(SF, int(11 * S))
+except Exception:
+    titlefont = ImageFont.truetype(MENLO, int(11 * S))
 
-PAD = 28
-LINE_H = FS + 10
-TITLEBAR = 56
-BG = (30, 31, 34)           # terminal body
-BAR = (60, 62, 66)          # title bar
-FG = (220, 221, 222)        # normal text
-GREEN = (126, 200, 110)     # prompt user@host
-BLUE = (97, 175, 239)       # path
-RED = (224, 108, 117)       # errors
-
-def color_for(line):
-    s = line.strip()
-    if s.startswith("zsh:") and "not found" in s or "permission denied" in s:
-        return RED
-    return FG
+# ---- default Terminal.app "Basic" profile: white bg, black mono text ----
+PADX = 9 * S
+PADTOP = 7 * S
+LINE_H = int(FS * 1.18)
+TITLEBAR = 28 * S
+BODY = (255, 255, 255)
+FG = (0, 0, 0)
+# macOS window chrome
+CORNER = 10 * S
+MARGIN = 34 * S                               # space around window for the drop shadow
 
 def render(txt_path, png_path, title):
     with open(txt_path) as f:
-        lines = [l.rstrip("\n") for l in f if l.strip("\n") != "" or True]
-    # drop trailing blank lines
+        lines = [l.rstrip("\n") for l in f]
     while lines and lines[-1].strip() == "":
         lines.pop()
 
-    # width based on longest line
     maxw = max((font.getlength(l) for l in lines), default=200)
-    W = int(maxw) + PAD * 2
-    W = max(W, 760)
-    H = TITLEBAR + PAD * 2 + LINE_H * len(lines)
+    inner_w = max(int(maxw) + PADX * 2, 560 * S)
+    inner_h = TITLEBAR + PADTOP * 2 + LINE_H * len(lines)
 
-    img = Image.new("RGB", (W, H), BG)
-    d = ImageDraw.Draw(img)
-    # title bar
-    d.rectangle([0, 0, W, TITLEBAR], fill=BAR)
+    # --- the terminal window itself ---
+    win = Image.new("RGB", (inner_w, inner_h), BODY)
+    d = ImageDraw.Draw(win)
+    # title bar: subtle vertical gray gradient like Terminal.app
+    for yy in range(TITLEBAR):
+        t = yy / TITLEBAR
+        g = int(236 - t * 26)
+        d.line([(0, yy), (inner_w, yy)], fill=(g, g, g))
+    d.line([(0, TITLEBAR - 1), (inner_w, TITLEBAR - 1)], fill=(176, 176, 176))
+    # traffic lights
     for i, c in enumerate([(255, 95, 86), (255, 189, 46), (39, 201, 63)]):
-        cx = 26 + i * 30
-        d.ellipse([cx, TITLEBAR//2 - 9, cx + 18, TITLEBAR//2 + 9], fill=c)
-    tw = font.getlength(title)
-    d.text(((W - tw) / 2, TITLEBAR/2 - FS/2), title, font=font, fill=(180, 181, 182))
+        cx = 14 * S + i * 20 * S
+        r = 6 * S
+        cy = TITLEBAR // 2
+        d.ellipse([cx, cy - r, cx + 2 * r, cy + r], fill=c)
+        d.ellipse([cx, cy - r, cx + 2 * r, cy + r], outline=(0, 0, 0, 30))
+    # centered window title: "folder — -zsh — 80x24"
+    wt = title
+    tw = titlefont.getlength(wt)
+    d.text(((inner_w - tw) / 2, (TITLEBAR - int(11 * S)) / 2 - S), wt,
+           font=titlefont, fill=(90, 90, 90))
 
-    y = TITLEBAR + PAD
-    PROMPT_MARK = " % "
+    # --- body text (monochrome, like default zsh prompt) ---
+    y = TITLEBAR + PADTOP
     for line in lines:
-        x = PAD
-        # color the prompt segment "user@host path %" then command in white
-        if PROMPT_MARK in line and line.split(PROMPT_MARK)[0].count("@") == 1:
-            head, _, cmd = line.partition(PROMPT_MARK)
-            # head = "rishav@Rishavs-MacBook-Air linux_assignment"
-            uh, _, path = head.partition(" ")
-            d.text((x, y), uh + " ", font=font, fill=GREEN); x += font.getlength(uh + " ")
-            d.text((x, y), path, font=font, fill=BLUE); x += font.getlength(path)
-            d.text((x, y), " % ", font=font, fill=FG); x += font.getlength(" % ")
-            d.text((x, y), cmd, font=bold, fill=FG)
-        else:
-            d.text((x, y), line, font=font, fill=color_for(line))
+        d.text((PADX, y), line, font=font, fill=FG)
         y += LINE_H
 
-    img.save(png_path)
+    # --- round the window corners ---
+    mask = Image.new("L", (inner_w, inner_h), 0)
+    md = ImageDraw.Draw(mask)
+    md.rounded_rectangle([0, 0, inner_w - 1, inner_h - 1], radius=CORNER, fill=255)
+    win.putalpha(mask)
+
+    # --- compose onto transparent canvas with a soft macOS window-capture shadow ---
+    W = inner_w + MARGIN * 2
+    H = inner_h + MARGIN * 2
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shadow)
+    sx, sy = MARGIN, MARGIN + 8 * S
+    sd.rounded_rectangle([sx, sy, sx + inner_w, sy + inner_h],
+                         radius=CORNER, fill=(0, 0, 0, 110))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(14 * S))
+    canvas = Image.alpha_composite(canvas, shadow)
+    canvas.alpha_composite(win, (MARGIN, MARGIN))
+
+    # downscale for crisp retina-quality result
+    canvas = canvas.resize((W // S, H // S), Image.LANCZOS)
+    canvas.save(png_path)
     return png_path
 
+WT = "linux_assignment — -zsh — 80×24"
 tasks = [
-    ("task1", "Task 1 — Creating and renaming files"),
-    ("task2", "Task 2 — Viewing file contents"),
-    ("task3", "Task 3 — Searching with grep"),
-    ("task4", "Task 4 — Zip and unzip"),
-    ("task5", "Task 5 — Downloading a file"),
-    ("task6", "Task 6 — Changing permissions"),
-    ("task7", "Task 7 — Environment variables"),
+    ("task1", WT),
+    ("task2", WT),
+    ("task3", WT),
+    ("task4", WT),
+    ("task5", WT),
+    ("task6", WT),
+    ("task7", WT),
 ]
 for key, title in tasks:
     render(os.path.join(SHOTS, key + ".txt"),
