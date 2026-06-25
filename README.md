@@ -16,6 +16,8 @@ mv test_dir/example.txt test_dir/renamed_example.txt
 
 After running mv the file showed up as renamed_example.txt when I listed the folder. So mv basically renames the file when you keep it in the same folder. touch is handy because it just makes a blank file without opening any editor.
 
+![Task 1 screenshot](shots/task1.png)
+
 ## 2. Looking at file contents
 
 I used the /etc/passwd file for this since it's always there. cat prints the whole thing, head shows the top of the file and tail shows the bottom.
@@ -48,6 +50,8 @@ _oahd:*:441:441:OAH Daemon:/var/empty:/usr/bin/false
 
 I used head and tail with -5 so I didn't have to scroll through the whole file. cat is fine for short files but for big ones head/tail are nicer.
 
+![Task 2 screenshot](shots/task2.png)
+
 ## 3. Searching with grep
 
 Then I searched for the word root inside /etc/passwd.
@@ -66,6 +70,8 @@ _cvmsroot:*:212:212:CVMS Root:/var/empty:/usr/bin/false
 
 grep goes line by line and only shows the lines that match what you searched for. There are a couple of system lines that point to /var/root as their home folder, so those came up too.
 
+![Task 3 screenshot](shots/task3.png)
+
 ## 4. Zipping and unzipping
 
 I zipped the whole test_dir folder and then unzipped it into a fresh folder to check it worked.
@@ -76,6 +82,8 @@ unzip -o test_dir.zip -d unzipped_dir
 ```
 
 The -r part is important because it tells zip to include everything inside the folder, not just the folder name. When I unzipped it, the renamed_example.txt file was sitting inside unzipped_dir/test_dir, exactly like the original. The -d just lets you pick which folder to extract into.
+
+![Task 4 screenshot](shots/task4.png)
 
 ## 5. Downloading a file
 
@@ -88,6 +96,8 @@ curl -L -o sample.html https://example.com   # what I actually used on Mac
 
 curl downloaded the file and saved it as sample.html. The -o lets you name the saved file and -L makes it follow redirects in case the link bounces somewhere else. I also noticed the sample.txt link in the example doesn't really exist (gives a 404), so I just downloaded the example.com homepage to show the download working.
 
+![Task 5 screenshot](shots/task5.png)
+
 ## 6. Changing permissions
 
 I made a file called secure.txt and then used chmod to make it read only for everyone.
@@ -98,6 +108,8 @@ chmod 444 secure.txt
 ```
 
 Before the change the permissions were -rw-r--r-- and after they became -r--r--r--. To test it I tried to add more text to the file and the terminal said "permission denied", which is exactly what should happen since I took away write access. The 444 is in octal where 4 means read, 2 means write and 1 means execute, and the three digits are for the owner, the group and everyone else. So 444 is read for all three and nothing else. I can undo it with chmod 644 later if I need to edit it again.
+
+![Task 6 screenshot](shots/task6.png)
 
 ## 7. Environment variables
 
@@ -111,6 +123,8 @@ env | grep MY_VAR
 
 echo $MY_VAR printed Hello, Linux! and when I ran env (which lists all the variables) I could see MY_VAR=Hello, Linux! in there too. One thing to remember is that this only lasts for the current terminal window. If I close it the variable is gone, so to keep it permanently I'd add the export line to my ~/.zshrc file.
 
+![Task 7 screenshot](shots/task7.png)
+
 ## Wrap up
 
-All seven tasks worked. The only thing that needed changing was wget since it isn't on Mac by default, so I used curl which does the same thing. Everything else ran without any problems. The screenshots of the terminal are attached in the submission doc.
+All seven tasks worked. The only thing that needed changing was wget since it isn't on Mac by default, so I used curl which does the same thing. Everything else ran without any problems. The terminal screenshots above show each command with its real output, and they're also in the submission doc.
